@@ -1,32 +1,12 @@
 ---
 title: "Rapport final du cours SQL"
-author: 'Tran Nam Maï, Clara Lucas, Salomon Hazan'
-date: "May 10, 2020"
+author: "SALOMON HAZAN, CLARA LUCAS, TRAN NAM MAI"
+date: "May 9, 2020"
 output:
-  html_notebook:
+  html_notebook: 
     toc: true
     toc_float: true
-  html_document:
-    df_print: paged
-    toc: yes
 ---
-
-```{r setup,}
-knitr::opts_chunk$set(include = FALSE)
-#Packages utilisés
-rm(list=ls())
-library(ggplot2)
-#install.packages(“ggthemes”)
-library(ggthemes)
-#install.packages(“extrafont”)
-library(extrafont)
-library(plyr)
-library(scales)
-library(formattable)
-library(janitor)
-library(readr)
-```
-
 L'objectif de ce rapport est de visualiser les données exportées à partir des requêtes SQL issues du projet transverse - Partie SQL. Ce rapport comprend 3 parties principales :
  
     I. Etude globale
@@ -43,20 +23,33 @@ L'objectif de ce rapport est de visualiser les données exportées à partir des
 
 Dans chaque partie, nous fournissons la requête SQL ainsi que les données exportées à partir de ces requêtes et les visualisations qui sont élaborées dans R.
 
+Attention : N’exécuter ce Rmarkdow que partie par partie, car les parties contenant des requêtes SQL renverront des erreurs. Si on exécute une partie une seconde fois, il y aura une erreur (relancer l’importation des données au préalable)
+
+```{r setup, include=FALSE}
+rm(list=ls())
+library(ggplot2)
+library(ggthemes)
+library(extrafont)
+library(plyr)
+library(scales)
+library(formattable)
+library(janitor)
+library(readr)
+```
 ```{r message=FALSE, warning=FALSE, include=FALSE}
-X1a <- read_delim("Data/New dataset/1a.CSV", 
-   "|", escape_double = FALSE, trim_ws = TRUE)
-X1b <- read_delim("Data/New dataset/1b.CSV", 
+X1a <- read_delim("Devoir a envoyer/Data/New dataset/1a.CSV", 
     "|", escape_double = FALSE, trim_ws = TRUE)
-X1c <- read_delim("Data/New dataset/1c.CSV", 
+X1b <- read_delim("Devoir a envoyer/Data/New dataset/1b.CSV", 
     "|", escape_double = FALSE, trim_ws = TRUE)
-X2a <- read_delim("Data/New dataset/2a.CSV", 
-   "|", escape_double = FALSE, trim_ws = TRUE)
-X2b <- read_delim("Data/New dataset/2b.CSV", 
+X1c <- read_delim("Devoir a envoyer/Data/New dataset/1c.CSV", 
     "|", escape_double = FALSE, trim_ws = TRUE)
-X3a <- read_delim("Data/New dataset/3a.CSV", 
+X2a <- read_delim("Devoir a envoyer/Data/New dataset/2a.CSV", 
     "|", escape_double = FALSE, trim_ws = TRUE)
-X3b <- read_delim("Data/New dataset/3b.CSV", 
+X2b <- read_delim("Devoir a envoyer/Data/New dataset/2b.CSV", 
+    "|", escape_double = FALSE, trim_ws = TRUE)
+X3a <- read_delim("Devoir a envoyer/Data/New dataset/3a.CSV", 
+    "|", escape_double = FALSE, trim_ws = TRUE)
+X3b <- read_delim("Devoir a envoyer/Data/New dataset/3b.CSV", 
     "|", escape_double = FALSE, trim_ws = TRUE)
 ```
 # I. Etude globale
@@ -102,16 +95,13 @@ join
 	and vip=0) as temp4
 using(factor);
 ```
-
 ### Résultat de la requête SQL
 - Répartition des clients par type
 
 ```{r echo=FALSE}
 head(X1a)
 ```
-
 ### Visualisation
-
 ```{r warning=FALSE}
 # Transform data
 X1a <- t(X1a)
@@ -149,7 +139,6 @@ ggplot(X1a, aes(ymax=ymax, ymin=ymin, xmax=4, xmin=3, fill=as.factor(factor))) +
   theme(plot.title = element_text(hjust = 0.5)) + 
   guides(fill = guide_legend("Type de client"))
 ```
-
 > La proportion de churner est la plus importante (34,79%) suivie du nombre d'adhérents (22,53%), des nouveaux adhérents 2016 (15,45%), et des nouveaux adhérents 2017 (14,18%). La proportion de VIP n'est que de 13,6%.
 
 ## 2. Comportement du CA GLOBAL par client N-2 vs N-1
@@ -180,12 +169,10 @@ join
 group by 1, 2) as temp2
 using(idclient_new);
 ```
-
 ### Données de la requête SQL
 ```{r}
 head(X1b)
 ```
-
 ### Visualisation
 ```{r message=FALSE, warning=FALSE}
 X1bnew1 <- X1b[,c(1,3)]
@@ -245,7 +232,7 @@ ggplot(X1bnewbis, aes(x = date_part, y = remove_outliers(tic_totalttc), color = 
 ```
 -CA 2016
 ```{r}
-summary(X1bnew2bis$tic_totalttc)
+summary(X1bnew1bis$tic_totalttc)
 ```
 -CA 2017
 ```{r}
@@ -256,7 +243,6 @@ summary(X1bnew2bis$tic_totalttc)
 Le deuxième graphique permet de mieux mettre en évidence la médiane du CA qui passe de 199 euros à 246 euros (le CA au-dessous duquel se situe 50 % des achats clients). La moyenne des achats après exclusion des outliers passe de 265 euros à 316 euros.
 
 ## 3. Répartition par âge et par sexe
-
 > Nous avons décidé de limiter la population à représenter afin d'avoir une meilleure distribution et une meilleure visibilité de la variable âge. Les clients étudiés étant des adhérents, nous avons exclu les moins de 18 ans et les plus de 100 ans.
 
 ### Requête SQL
@@ -409,7 +395,6 @@ order by case 	when indice_evol = 'positive' then 1
 				when indice_evol = 'moyen' then 2
 				when indice_evol = 'negative' then 3 end;
 ```
-
 ### Données de la requête SQL
 ```{r}
 head(X2a)
@@ -623,21 +608,22 @@ head(X3b,10)
 ### Visualisation
 ```{r}
 colnames(X3b) <- c("univers", "famille", "rentabilite", "rang")
-general <- formatter("span",
-  style = x ~ style(
-    display = "inline-block",
-    direction = "rtl",
-    "border-radius" = "4px",
-    "padding-right" = "2px",
-    "background-color" = csscolor("lightgreen"),
-    width = percent(proportion(x)),
-    color = csscolor(gradient(x, "black", "black"))
-  ))
-formattable(X3b, list(rentabilite = general))
+my_colorbar <- function(col1 = "lightgreen", col2 = "red", ...){
+  formatter("span",
+            style = function(x) style(
+              display = "inline-block",
+              float = ifelse(x >= 0, "right", "left"),
+              "text-align" = ifelse(x >= 0, "right", "left"),
+              "margin-left" = ifelse(x >= 0, "0%", "50%"),
+              "margin-right" = ifelse(x >= 0,"50%", "0%"),
+              "border-radius" = "4px",
+              "background-color" = ifelse(x >= 0, col1, col2),
+              width = percent(0.5*proportion(abs(as.numeric(x)), ...))
+            ))}
+formattable(X3b, list(rentabilite = my_colorbar()))
 ```
 
-Commentaire :
-Nous constatons ici que l'univers qui rapporte le plus est U3 (20 676 748 euros) suivi de U1, U4, U2 et enfin U0. Ce dernier comportant des familles dégageant des marges très disparates.
+> Nous constatons ici que l'univers qui rapporte le plus est U3 (20 676 748 euros) suivi de U1, U4, U2 et enfin U0. Ce dernier comportant des familles dégageant des marges très disparates.
 L'univers "coupon" est bien entendu négatif puisqu'il aggrège les montants des réductions appliquées en magasin. 
 
 
